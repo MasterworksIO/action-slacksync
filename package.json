@@ -33,10 +33,13 @@
     "@actions/artifact": "^0.3.0",
     "@actions/core": "^1.2.3",
     "@actions/github": "^2.1.1",
+    "@octokit/rest": "^17.5.2",
+    "@octokit/types": "^2.12.1",
+    "@slack/web-api": "^5.8.0",
     "aws-sdk": "^2.654.0",
     "commander": "^5.0.0",
     "loglevel": "^1.6.7",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^3.0.0-beta.5"
   },
   "devDependencies": {
     "@stefanmaric/eslint-config-munchies-base": "^0.2.0",

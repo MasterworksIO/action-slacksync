@@ -1,10 +1,17 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'slacksync'
+description: 'Sync job status with Slack'
 inputs:
-  myInput:
-    description: 'input description here'
-    default: 'default value if applicable'
+  channel:
+    description: 'Channel ID to post to'
+  renderer:
+    description: 'Renderer config file'
+  token:
+    description: 'Slack API token'
+  GITHUB_TOKEN:
+    description: Secret GitHub API token to use for making API requests.
+    default: ${{ github.token }} # same as ${{ secrets.GITHUB_TOKEN }}
+    required: true
 runs:
   using: 'node12'
   main: 'dist/index.js'
+  post: 'dist/index.js'
