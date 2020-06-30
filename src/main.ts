@@ -4,23 +4,16 @@ import * as path from 'path'
 
 import * as artifact from '@actions/artifact'
 import * as core from '@actions/core'
-import { GitHub, context } from '@actions/github'
-import { Octokit } from '@octokit/rest'
+import { context, getOctokit } from '@actions/github'
 import fetch from 'node-fetch'
 
 import type { Context } from '@actions/github/lib/context'
-import type { GetResponseDataTypeFromEndpointMethod } from '@octokit/types'
-import type { ChatPostMessageArguments } from '@slack/web-api'
+import type { ActionsListJobsForWorkflowRunResponseData } from '@octokit/types'
+import type { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api'
 
 import log, { objectDebug } from './log'
 
-const octokit = new Octokit()
-
-type ActionsListJobsForWorkflowRunResponseDataType = GetResponseDataTypeFromEndpointMethod<
-  typeof octokit.actions.listJobsForWorkflowRun
->
-
-type ActionsListJobsForWorkflowRunJobs = ActionsListJobsForWorkflowRunResponseDataType['jobs']
+type ActionsListJobsForWorkflowRunJobs = ActionsListJobsForWorkflowRunResponseData['jobs']
 
 export type RendererInput = {
   channel?: string
@@ -49,6 +42,10 @@ export type RendererOutput = Pick<
 >
 
 export type Renderer = (arg0: RendererInput) => RendererOutput
+
+interface SlackMessageResult extends WebAPICallResult {
+  ts: string
+}
 
 const defaultRenderer: Renderer = ({ jobs }) => {
   const completed = jobs.filter((job) => job.conclusion)
@@ -85,12 +82,11 @@ const run = async (): Promise<void> => {
 
     objectDebug('context', context)
 
-    const github = new GitHub(core.getInput('GITHUB_TOKEN'))
+    const github = getOctokit(core.getInput('GITHUB_TOKEN'))
 
     const jobs: ActionsListJobsForWorkflowRunJobs = await github.paginate(
       github.actions.listJobsForWorkflowRun.endpoint.merge({
         ...context.repo,
-        /* eslint-disable-next-line @typescript-eslint/camelcase */
         run_id: githubRunId,
       })
     )
@@ -160,7 +156,7 @@ const run = async (): Promise<void> => {
         throw new Error(`Failed to POST message`)
       }
 
-      const responseBody = await response.json()
+      const responseBody = (await response.json()) as SlackMessageResult
 
       objectDebug('responseBody', responseBody)
 
@@ -188,7 +184,7 @@ const run = async (): Promise<void> => {
         throw new Error(`Failed to POST message`)
       }
 
-      const responseBody = await response.json()
+      const responseBody = (await response.json()) as SlackMessageResult
 
       objectDebug('responseBody', responseBody)
 
