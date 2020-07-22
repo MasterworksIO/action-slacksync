@@ -1,101 +1,93 @@
-<p align="center">
-  <a href="https://github.com/MasterworksIO/action-slacksync/actions"><img alt="action-slacksync status" src="https://github.com/MasterworksIO/action-slacksync/workflows/build-test/badge.svg"></a>
-</p>
+## Slack Sync for GitHub Actions
 
-# Create a JavaScript Action using TypeScript
+Show the workflow progress showing jobs and results live in Slack.
 
-Use this template to bootstrap the creation of a JavaScript action.:rocket:
+**Table of Contents**
 
-This template includes compilication support, tests, a validation workflow, publishing, and versioning guidance.
+<!-- toc -->
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+- [Usage](#usage)
+- [Credentials and Region](#credentials-and-region)
+- [Permissions](#permissions)
+- [License Summary](#license-summary)
+- [Security Disclosures](#security-disclosures)
 
-## Create an action from this template
+<!-- tocstop -->
 
-Click the `Use this Template` and provide the new repo details for your action
-
-## Code in Master
-
-Install the dependencies
-```bash
-$ npm install
-```
-
-Build the typescript and package it for distribution
-```bash
-$ npm run build && npm run pack
-```
-
-Run the tests :heavy_check_mark:
-```bash
-$ npm test
-
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml contains defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try {
-      ...
-  }
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder.
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run pack
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Your action is now published! :rocket:
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml)])
+## Usage
 
 ```yaml
-uses: ./
-with:
-  milliseconds: 1000
+name: Push
+on: push
+
+env:
+  SLACKSYNC_CHANNEL: XMXXXXTW
+  SLACKSYNC_RENDERER: './.github/slacksync.push.js'
+  SLACKSYNC_TOKEN: '${{ secrets.SLACK_TOKEN }}'
+
+jobs:
+  prepare:
+    name: Prepare
+    runs-on: ubuntu-20.04
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: MasterworksIO/action-slacksync@master
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-20.04
+    needs: prepare
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: MasterworksIO/action-slacksync@master
+      [ ... other steps of the job ]
+      
+      
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    needs: prepare
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: MasterworksIO/action-slacksync@master
+      [ ... other steps of the job ]
+
+  deploy:
+    name: Build
+    runs-on: ubuntu-20.04
+    needs: [build, lint]
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: MasterworksIO/action-slacksync@master
+      [ ... other steps of the job ]
+
+   [ ... other jobs ]
+
+  conclusion:
+    name: 'Conclusion'
+    runs-on: ubuntu-20.04
+    needs: [deploy]
+    if: always()
+    steps:
+      - uses: actions/checkout@v2
+      - uses: MasterworksIO/action-slacksync@master
 ```
 
-See the [actions tab](https://github.com/actions/javascript-action/actions) for runs of this action! :rocket:
+See [action.yml](action.yml) for the full documentation for this action's inputs and outputs.
 
-## Usage:
 
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
+## Credentials 
+
+The `SLACKSYNC_TOKEN` env variable must be defined on the repository secrets. 
+
+## License Summary
+
+This code is made available under the MIT license.
+
+## Security Disclosures
+
+If you would like to report a potential security issue in this project, please do not create a GitHub issue.  Instead, please follow the instructions [here](https://aws.amazon.com/security/vulnerability-reporting/) or [email AWS security directly](mailto:aws-security@amazon.com).
