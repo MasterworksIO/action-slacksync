@@ -31,7 +31,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions/artifact": "^0.3.2",
-    "@actions/core": "^1.2.4",
+    "@actions/core": "^1.2.6",
     "@actions/github": "^4.0.0",
     "@octokit/types": "^5.0.1",
     "@slack/web-api": "^5.10.0",
