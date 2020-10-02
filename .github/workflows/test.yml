@@ -12,9 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - run: |
-        npm install
-        npm run all
+    - run: npm install
+    - run: npm run build
+    - run: npm run pack
+    - run: export INPUT_GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}' npm run test
   test: # make sure the action works on a clean machine without building
     runs-on: ubuntu-latest
     steps:
