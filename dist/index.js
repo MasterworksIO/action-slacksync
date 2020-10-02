@@ -65,9 +65,16 @@ const github_1 = __webpack_require__(5438);
 const node_fetch_1 = __importDefault(__webpack_require__(7957));
 const log_1 = __importStar(__webpack_require__(3700));
 const defaultRenderer = ({ jobs }) => {
-    const completed = jobs.filter((job) => job.conclusion);
+    const finalJob = jobs.find((job) => job.name.match(/conclusion/i));
+    const finished = Boolean(finalJob);
+    if (!finished) {
+        const completed = jobs.filter((job) => job.conclusion);
+        return {
+            text: `Workflow running: job ${completed.length + 1}`,
+        };
+    }
     return {
-        text: `Workflow (${completed.length}/${jobs.length})`,
+        text: `Workflow completed`,
     };
 };
 const artifactClient = artifact.create();

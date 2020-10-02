@@ -2,11 +2,7 @@ import * as process from 'process'
 import * as cp from 'child_process'
 import * as path from 'path'
 
-const REQUIRED_VARIABLES = [
-  'INPUT_GITHUB_TOKEN',
-  'SLACKSYNC_CHANNEL',
-  'SLACKSYNC_TOKEN',
-]
+const REQUIRED_VARIABLES = ['INPUT_GITHUB_TOKEN', 'SLACKSYNC_CHANNEL', 'SLACKSYNC_TOKEN']
 
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', () => {

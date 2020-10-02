@@ -48,10 +48,19 @@ interface SlackMessageResult extends WebAPICallResult {
 }
 
 const defaultRenderer: Renderer = ({ jobs }) => {
-  const completed = jobs.filter((job) => job.conclusion)
+  const finalJob = jobs.find((job) => job.name.match(/conclusion/i))
+  const finished = Boolean(finalJob)
+
+  if (!finished) {
+    const completed = jobs.filter((job) => job.conclusion)
+
+    return {
+      text: `Workflow running: job ${completed.length + 1}`,
+    }
+  }
 
   return {
-    text: `Workflow (${completed.length}/${jobs.length})`,
+    text: `Workflow completed`,
   }
 }
 
