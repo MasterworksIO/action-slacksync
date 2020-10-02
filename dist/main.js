@@ -31,9 +31,16 @@ const github_1 = require("@actions/github");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const log_1 = __importStar(require("./log"));
 const defaultRenderer = ({ jobs }) => {
-    const completed = jobs.filter((job) => job.conclusion);
+    const finalJob = jobs.find((job) => job.name.match(/conclusion/i));
+    const finished = Boolean(finalJob);
+    if (!finished) {
+        const completed = jobs.filter((job) => job.conclusion);
+        return {
+            text: `Workflow running: job ${completed.length + 1}`,
+        };
+    }
     return {
-        text: `Workflow (${completed.length}/${jobs.length})`,
+        text: `Workflow completed`,
     };
 };
 const artifactClient = artifact.create();

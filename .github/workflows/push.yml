@@ -1,0 +1,30 @@
+name: Push
+on: push
+
+env:
+  SLACKSYNC_CHANNEL: 'C7CPHQ337'
+  SLACKSYNC_TOKEN: '${{ secrets.SLACK_TOKEN }}'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: ./
+
+  tests:
+    runs-on: ubuntu-latest
+    needs: [prepare]
+    steps:
+    - uses: actions/checkout@v1
+    - run: npm install
+    - run: npm run build
+    - run: npm run pack
+    - run: export INPUT_GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}' npm run test
+
+  conclusion:
+    runs-on: ubuntu-latest
+    needs: [tests]
+    steps:
+    - uses: actions/checkout@v1
+    - uses: ./

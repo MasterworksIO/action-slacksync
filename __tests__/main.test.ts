@@ -2,14 +2,14 @@ import * as process from 'process'
 import * as cp from 'child_process'
 import * as path from 'path'
 
+const REQUIRED_VARIABLES = ['INPUT_GITHUB_TOKEN', 'SLACKSYNC_CHANNEL', 'SLACKSYNC_TOKEN']
+
 // shows how the runner will run a javascript action with env / stdout protocol
 test('test runs', () => {
-  if (!process.env.SLACKSYNC_TOKEN) {
-    throw new Error('SLACKSYNC_TOKEN has to be set in order to run tests')
-  }
-
-  if (!process.env.SLACKSYNC_CHANNEL) {
-    throw new Error('SLACKSYNC_CHANNEL has to be set in order to run tests')
+  for (let env of REQUIRED_VARIABLES) {
+    if (!process.env[env]) {
+      throw new Error(`${env} has to be set in order to run tests`)
+    }
   }
 
   const ip = path.join(__dirname, '..', 'dist', 'main.js')
