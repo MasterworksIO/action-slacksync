@@ -8,12 +8,12 @@ import { context, getOctokit } from '@actions/github'
 import fetch from 'node-fetch'
 
 import type { Context } from '@actions/github/lib/context'
-import type { ActionsListJobsForWorkflowRunResponseData } from '@octokit/types'
+import type { Endpoints } from '@octokit/types'
 import type { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api'
 
 import log, { objectDebug } from './log'
 
-type ActionsListJobsForWorkflowRunJobs = ActionsListJobsForWorkflowRunResponseData['jobs']
+type ActionsListJobsForWorkflowRunJobs = Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
 
 export type RendererInput = {
   channel?: string
@@ -41,13 +41,15 @@ export type RendererOutput = Pick<
   | 'username'
 >
 
-export type Renderer = (arg0: RendererInput) => RendererOutput
+export interface IRenderer {
+  (arg0: RendererInput): RendererOutput
+}
 
 interface SlackMessageResult extends WebAPICallResult {
   ts: string
 }
 
-const defaultRenderer: Renderer = ({ jobs }) => {
+const defaultRenderer: IRenderer = ({ jobs }) => {
   const finalJob = jobs.find((job) => job.name.match(/conclusion/i))
   const finished = Boolean(finalJob)
 
