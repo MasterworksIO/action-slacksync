@@ -1,4 +1,4 @@
-## Slack Sync for GitHub Actions
+# Slack Sync for GitHub Actions
 
 Show the workflow progress showing jobs and results live in Slack.
 
@@ -43,8 +43,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: MasterworksIO/action-slacksync@master
       [ ... other steps of the job ]
-      
-      
+
+
   build:
     name: Build
     runs-on: ubuntu-20.04
@@ -80,9 +80,9 @@ jobs:
 See [action.yml](action.yml) for the full documentation for this action's inputs and outputs.
 
 
-## Credentials 
+## Credentials
 
-The `SLACKSYNC_TOKEN` env variable must be defined on the repository secrets. 
+The `SLACKSYNC_TOKEN` env variable must be defined on the repository secrets.
 
 ## License Summary
 
