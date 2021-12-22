@@ -13,7 +13,8 @@ import type { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api'
 
 import log, { objectDebug } from './log'
 
-type ActionsListJobsForWorkflowRunJobs = Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
+type ActionsListJobsForWorkflowRunJobs =
+  Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
 
 export type RendererInput = {
   channel?: string
@@ -96,7 +97,7 @@ const run = async (): Promise<void> => {
     const github = getOctokit(core.getInput('GITHUB_TOKEN'))
 
     const jobs: ActionsListJobsForWorkflowRunJobs = await github.paginate(
-      github.actions.listJobsForWorkflowRun.endpoint.merge({
+      github.rest.actions.listJobsForWorkflowRun.endpoint.merge({
         ...context.repo,
         run_id: githubRunId,
       })
@@ -113,10 +114,10 @@ const run = async (): Promise<void> => {
 
       const artifactBuffer = await fs.readFile(artifactLocation, { encoding: 'utf-8' })
       messageTimestamp = artifactBuffer.toString()
-    } catch (err) {
+    } catch (err: unknown) {
       // @actions/artifact just throws a generic new Error(<string>), no class instance and not even
       // an error code, thus we cannot identify it by anything other than the message.
-      if (err.message.match(/unable to find/i)) {
+      if (err instanceof Error && err.message.match(/unable to find/i)) {
         log.info('No artifact found')
       } else {
         throw err
@@ -132,7 +133,7 @@ const run = async (): Promise<void> => {
 
       log.debug(`slacksync: rendererLocation=${rendererLocation}`)
 
-      renderer = (await import(rendererLocation)).default
+      renderer = (await import(rendererLocation)).default as IRenderer
     }
 
     const renderResult = renderer({
@@ -217,10 +218,10 @@ const run = async (): Promise<void> => {
     }
 
     log.info(`slacksync: finished action (${messageTimestamp})`)
-  } catch (error) {
+  } catch (error: unknown) {
     console.trace(error)
-    core.setFailed(error.message)
+    core.setFailed(error instanceof Error ? error.message : `unkown error: ${error}`)
   }
 }
 
-run()
+void run()

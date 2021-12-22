@@ -12,6 +12,6 @@ inputs:
     default: ${{ github.token }} # same as ${{ secrets.GITHUB_TOKEN }}
     required: true
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
   post: 'dist/index.js'
