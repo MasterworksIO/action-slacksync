@@ -13,6 +13,13 @@ import type { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api'
 
 import log, { objectDebug } from './log'
 
+class SlackCommunicationError extends Error {
+  code = ''
+  constructor() {
+    super(`Failed to POST message to Slack`)
+  }
+}
+
 type ActionsListJobsForWorkflowRunJobs =
   Endpoints['GET /repos/{owner}/{repo}/actions/runs/{run_id}/jobs']['response']['data']['jobs']
 
@@ -165,7 +172,7 @@ const run = async (): Promise<void> => {
       })
 
       if (!response.ok) {
-        throw new Error(`Failed to POST message`)
+        throw new SlackCommunicationError()
       }
 
       const responseBody = (await response.json()) as SlackMessageResult
@@ -173,7 +180,7 @@ const run = async (): Promise<void> => {
       objectDebug('responseBody', responseBody)
 
       if (!responseBody.ok) {
-        throw new Error(`Failed to POST message`)
+        throw new SlackCommunicationError()
       }
     } else {
       const payload = {
@@ -193,7 +200,7 @@ const run = async (): Promise<void> => {
       })
 
       if (!response.ok) {
-        throw new Error(`Failed to POST message`)
+        throw new SlackCommunicationError()
       }
 
       const responseBody = (await response.json()) as SlackMessageResult
@@ -201,7 +208,7 @@ const run = async (): Promise<void> => {
       objectDebug('responseBody', responseBody)
 
       if (!responseBody.ok) {
-        throw new Error(`Failed to POST message`)
+        throw new SlackCommunicationError()
       }
 
       messageTimestamp = responseBody.ts
@@ -220,7 +227,12 @@ const run = async (): Promise<void> => {
     log.info(`slacksync: finished action (${messageTimestamp})`)
   } catch (error: unknown) {
     console.trace(error)
-    core.setFailed(error instanceof Error ? error.message : `unkown error: ${error}`)
+
+    if (error instanceof SlackCommunicationError) {
+      log.warn(`${error.code}: ${error.message}`)
+    } else {
+      core.setFailed(error instanceof Error ? error.message : `unknown error: ${error}`)
+    }
   }
 }
 
