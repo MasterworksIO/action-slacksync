@@ -18,7 +18,6 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - run: npm install
-    - run: npm run build
     - run: npm run pack
     - run: export INPUT_GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}' npm run test
 
