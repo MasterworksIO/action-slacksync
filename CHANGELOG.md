@@ -3,6 +3,7 @@
 ## Unreleased
 
 - Add Security Policy file to the project
+- Improve docs with token creation & usage instructions
 
 ## 1.1.0 - 2021-12-22
 
