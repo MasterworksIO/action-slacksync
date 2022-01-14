@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add Security Policy file to the project
+
 ## 1.1.0 - 2021-12-22
 
 - Fix tests and own workflow

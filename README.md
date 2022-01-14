@@ -2,18 +2,6 @@
 
 Show the workflow progress showing jobs and results live in Slack.
 
-**Table of Contents**
-
-<!-- toc -->
-
-- [Usage](#usage)
-- [Credentials and Region](#credentials-and-region)
-- [Permissions](#permissions)
-- [License Summary](#license-summary)
-- [Security Disclosures](#security-disclosures)
-
-<!-- tocstop -->
-
 ## Usage
 
 ```yaml
@@ -86,8 +74,8 @@ The `SLACKSYNC_TOKEN` env variable must be defined on the repository secrets.
 
 ## License Summary
 
-This code is made available under the MIT license.
+This code is made available under the MIT license. Read [LICENSE](./LICENSE) for more.
 
 ## Security Disclosures
 
-If you would like to report a potential security issue in this project, please do not create a GitHub issue.  Instead, please follow the instructions [here](https://aws.amazon.com/security/vulnerability-reporting/) or [email AWS security directly](mailto:aws-security@amazon.com).
+If you would like to report a potential security issue in this project, please do not create a GitHub issue.  Instead, please follow the instructions in [our Security Policy doc](./SECURITY.md).
