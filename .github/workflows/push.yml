@@ -2,7 +2,7 @@ name: Push
 on: push
 
 env:
-  SLACKSYNC_CHANNEL: 'C7CPHQ337'
+  SLACKSYNC_CHANNEL: 'C012NUFBCLU'
   SLACKSYNC_TOKEN: '${{ secrets.SLACK_TOKEN }}'
 
 jobs:
