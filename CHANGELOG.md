@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Improve handling and logging of Slack errors
+- Upgrade all dependencies
 - Add Security Policy file to the project
 - Improve docs with token creation & usage instructions
 

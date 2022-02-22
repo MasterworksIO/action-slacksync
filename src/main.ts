@@ -162,14 +162,21 @@ const run = async (): Promise<void> => {
 
       objectDebug('payload', payload)
 
-      const response = await fetch('https://slack.com/api/chat.update', {
-        body: JSON.stringify(payload),
-        headers: {
-          Authorization: `Bearer ${options.token}`,
-          'Content-type': 'application/json',
-        },
-        method: 'POST',
-      })
+      let response
+
+      try {
+        response = await fetch('https://slack.com/api/chat.update', {
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${options.token}`,
+            'Content-type': 'application/json',
+          },
+          method: 'POST',
+        })
+      } catch (error: unknown) {
+        log.error(error)
+        throw new SlackCommunicationError()
+      }
 
       if (!response.ok) {
         throw new SlackCommunicationError()
@@ -190,14 +197,21 @@ const run = async (): Promise<void> => {
 
       objectDebug('payload', payload)
 
-      const response = await fetch('https://slack.com/api/chat.postMessage', {
-        body: JSON.stringify(payload),
-        headers: {
-          Authorization: `Bearer ${options.token}`,
-          'Content-type': 'application/json',
-        },
-        method: 'POST',
-      })
+      let response
+
+      try {
+        response = await fetch('https://slack.com/api/chat.postMessage', {
+          body: JSON.stringify(payload),
+          headers: {
+            Authorization: `Bearer ${options.token}`,
+            'Content-type': 'application/json',
+          },
+          method: 'POST',
+        })
+      } catch (error: unknown) {
+        log.error(error)
+        throw new SlackCommunicationError()
+      }
 
       if (!response.ok) {
         throw new SlackCommunicationError()
@@ -229,7 +243,7 @@ const run = async (): Promise<void> => {
     console.trace(error)
 
     if (error instanceof SlackCommunicationError) {
-      log.warn(`${error.code}: ${error.message}`)
+      log.error(`${error.code}: ${error.message}`)
     } else {
       core.setFailed(error instanceof Error ? error.message : `unknown error: ${error}`)
     }
