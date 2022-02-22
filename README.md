@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: MasterworksIO/action-slacksync@1.1.0
+      - uses: MasterworksIO/action-slacksync@1
 
   lint:
     name: Lint
@@ -49,7 +49,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: MasterworksIO/action-slacksync@1.1.0
+      - uses: MasterworksIO/action-slacksync@1
       [ ... other steps of the job ]
 
 
@@ -60,7 +60,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: MasterworksIO/action-slacksync@1.1.0
+      - uses: MasterworksIO/action-slacksync@1
       [ ... other steps of the job ]
 
   deploy:
@@ -70,7 +70,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: MasterworksIO/action-slacksync@1.1.0
+      - uses: MasterworksIO/action-slacksync@1
       [ ... other steps of the job ]
 
    [ ... other jobs ]
@@ -82,7 +82,7 @@ jobs:
     if: always()
     steps:
       - uses: actions/checkout@v2
-      - uses: MasterworksIO/action-slacksync@1.1.0
+      - uses: MasterworksIO/action-slacksync@1
 ```
 
 See [action.yml](./action.yml) for the full documentation for this action's inputs and outputs.

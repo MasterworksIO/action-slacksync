@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 1.1.1 - 2022-02-22
+
 - Improve handling and logging of Slack errors
 - Upgrade all dependencies
 - Add Security Policy file to the project
