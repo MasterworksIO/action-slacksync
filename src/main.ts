@@ -87,6 +87,7 @@ const run = async (): Promise<void> => {
       token: core.getInput('token') || process.env.SLACKSYNC_TOKEN,
       channel: core.getInput('channel') || process.env.SLACKSYNC_CHANNEL,
       renderer: core.getInput('renderer') || process.env.SLACKSYNC_RENDERER,
+      endpoint: core.getInput('endpoint') || process.env.SLACKSYNC_ENDPOINT || 'https://slack.com/api'
     }
 
     objectDebug('options', options)
@@ -164,8 +165,9 @@ const run = async (): Promise<void> => {
 
       let response
 
+
       try {
-        response = await fetch('https://slack.com/api/chat.update', {
+        response = await fetch(`${options.endpoint}/chat.update`, {
           body: JSON.stringify(payload),
           headers: {
             Authorization: `Bearer ${options.token}`,
@@ -200,7 +202,7 @@ const run = async (): Promise<void> => {
       let response
 
       try {
-        response = await fetch('https://slack.com/api/chat.postMessage', {
+        response = await fetch(`${options.endpoint}/chat.postMessage`, {
           body: JSON.stringify(payload),
           headers: {
             Authorization: `Bearer ${options.token}`,
