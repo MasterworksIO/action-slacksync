@@ -226,18 +226,19 @@ const run = async (): Promise<void> => {
       if (!responseBody.ok) {
         throw new SlackCommunicationError()
       }
-
-      messageTimestamp = responseBody.ts
-
-      await fs.writeFile(artifactLocation, messageTimestamp, 'utf-8')
-
-      const uploadResult = await artifactClient.uploadArtifact(
-        ARTIFACT_KEY,
-        [artifactLocation],
-        tempDir
-      )
-
-      objectDebug('uploadResult', uploadResult)
+      if(responseBody.ts) {
+        messageTimestamp = responseBody.ts
+  
+        await fs.writeFile(artifactLocation, messageTimestamp, 'utf-8')
+  
+        const uploadResult = await artifactClient.uploadArtifact(
+          ARTIFACT_KEY,
+          [artifactLocation],
+          tempDir
+        )
+  
+        objectDebug('uploadResult', uploadResult)
+      }
     }
 
     log.info(`slacksync: finished action (${messageTimestamp})`)
