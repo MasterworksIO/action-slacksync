@@ -7,6 +7,8 @@ inputs:
     description: 'Renderer config file'
   token:
     description: 'Slack API token'
+  endpoint:
+    description: 'Custom Endpoint'
   GITHUB_TOKEN:
     description: Secret GitHub API token to use for making API requests.
     default: ${{ github.token }} # same as ${{ secrets.GITHUB_TOKEN }}
