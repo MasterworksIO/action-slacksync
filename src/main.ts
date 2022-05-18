@@ -85,6 +85,7 @@ const artifactClient = artifact.create()
 
 const ARTIFACT_KEY = 'slacksync'
 const ARTIFACT_FILENAME = 'slacksync.txt'
+const DEFAULT_ENDPOINT = 'https://slack.com/api'
 
 const CWD = process.cwd()
 
@@ -94,7 +95,8 @@ const run = async (retries = 3): Promise<void> => {
       token: core.getInput('token') || process.env.SLACKSYNC_TOKEN,
       channel: core.getInput('channel') || process.env.SLACKSYNC_CHANNEL,
       renderer: core.getInput('renderer') || process.env.SLACKSYNC_RENDERER,
-      endpoint: core.getInput('endpoint') || process.env.SLACKSYNC_ENDPOINT || 'https://slack.com/api'
+      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+      endpoint: core.getInput('endpoint') || process.env.SLACKSYNC_ENDPOINT || DEFAULT_ENDPOINT
     }
 
     objectDebug('options', options)
@@ -246,7 +248,7 @@ const run = async (retries = 3): Promise<void> => {
       if (!responseBody.ok) {
         throw new SlackCommunicationError()
       }
-      if(responseBody.ts) {
+      if (responseBody.ts) {
         messageTimestamp = responseBody.ts
 
         await fs.writeFile(artifactLocation, messageTimestamp, 'utf-8')
@@ -265,12 +267,10 @@ const run = async (retries = 3): Promise<void> => {
   } catch (error: unknown) {
     console.trace(error)
 
-    if (
-      error instanceof SlackCommunicationError || error instanceof SlackOutputError
-    ) {
+    if (error instanceof SlackCommunicationError || error instanceof SlackOutputError) {
       log.error(`${error.code}: ${error.message}`)
       log.info(`Retrying... (${retries} retries left)`)
-      if(retries) {
+      if (retries) {
         await run(retries - 1)
       }
     } else {
