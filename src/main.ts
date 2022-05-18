@@ -96,7 +96,7 @@ const run = async (retries = 3): Promise<void> => {
       channel: core.getInput('channel') || process.env.SLACKSYNC_CHANNEL,
       renderer: core.getInput('renderer') || process.env.SLACKSYNC_RENDERER,
       // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      endpoint: core.getInput('endpoint') || process.env.SLACKSYNC_ENDPOINT || DEFAULT_ENDPOINT
+      endpoint: core.getInput('endpoint') || process.env.SLACKSYNC_ENDPOINT || DEFAULT_ENDPOINT,
     }
 
     objectDebug('options', options)

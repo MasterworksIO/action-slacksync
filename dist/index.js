@@ -19162,6 +19162,12 @@ class SlackCommunicationError extends Error {
         this.code = '';
     }
 }
+class SlackOutputError extends Error {
+    constructor() {
+        super(`Malformed response from Slack server`);
+        this.code = '';
+    }
+}
 const defaultRenderer = ({ jobs }) => {
     const finalJob = jobs.find((job) => job.name.match(/conclusion/i));
     const finished = Boolean(finalJob);
@@ -19178,13 +19184,17 @@ const defaultRenderer = ({ jobs }) => {
 const artifactClient = artifact.create();
 const ARTIFACT_KEY = 'slacksync';
 const ARTIFACT_FILENAME = 'slacksync.txt';
+const DEFAULT_ENDPOINT = 'https://slack.com/api';
 const CWD = process.cwd();
-const run = async () => {
+const run = async (retries = 3) => {
+    var _a, _b;
     try {
         const options = {
             token: core.getInput('token') || process.env.SLACKSYNC_TOKEN,
             channel: core.getInput('channel') || process.env.SLACKSYNC_CHANNEL,
             renderer: core.getInput('renderer') || process.env.SLACKSYNC_RENDERER,
+            // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+            endpoint: core.getInput('endpoint') || process.env.SLACKSYNC_ENDPOINT || DEFAULT_ENDPOINT,
         };
         (0, log_1.objectDebug)('options', options);
         const githubRunId = Number(process.env.GITHUB_RUN_ID);
@@ -19231,6 +19241,8 @@ const run = async () => {
             jobs,
         });
         (0, log_1.objectDebug)('renderResult', renderResult);
+        let response;
+        let responseBody;
         if (messageTimestamp) {
             const payload = {
                 ...renderResult,
@@ -19238,9 +19250,8 @@ const run = async () => {
                 ts: messageTimestamp,
             };
             (0, log_1.objectDebug)('payload', payload);
-            let response;
             try {
-                response = await (0, node_fetch_1.default)('https://slack.com/api/chat.update', {
+                response = await (0, node_fetch_1.default)(`${options.endpoint}/chat.update`, {
                     body: JSON.stringify(payload),
                     headers: {
                         Authorization: `Bearer ${options.token}`,
@@ -19256,7 +19267,15 @@ const run = async () => {
             if (!response.ok) {
                 throw new SlackCommunicationError();
             }
-            const responseBody = (await response.json());
+            if (!((_a = response.headers.get('content-type')) === null || _a === void 0 ? void 0 : _a.split(';').includes('application/json'))) {
+                throw new SlackOutputError();
+            }
+            try {
+                responseBody = (await response.json());
+            }
+            catch (error) {
+                throw new SlackOutputError();
+            }
             (0, log_1.objectDebug)('responseBody', responseBody);
             if (!responseBody.ok) {
                 throw new SlackCommunicationError();
@@ -19268,9 +19287,8 @@ const run = async () => {
                 channel: options.channel,
             };
             (0, log_1.objectDebug)('payload', payload);
-            let response;
             try {
-                response = await (0, node_fetch_1.default)('https://slack.com/api/chat.postMessage', {
+                response = await (0, node_fetch_1.default)(`${options.endpoint}/chat.postMessage`, {
                     body: JSON.stringify(payload),
                     headers: {
                         Authorization: `Bearer ${options.token}`,
@@ -19286,22 +19304,36 @@ const run = async () => {
             if (!response.ok) {
                 throw new SlackCommunicationError();
             }
-            const responseBody = (await response.json());
+            if (!((_b = response.headers.get('content-type')) === null || _b === void 0 ? void 0 : _b.split(';').includes('application/json'))) {
+                throw new SlackOutputError();
+            }
+            try {
+                responseBody = (await response.json());
+            }
+            catch (error) {
+                throw new SlackOutputError();
+            }
             (0, log_1.objectDebug)('responseBody', responseBody);
             if (!responseBody.ok) {
                 throw new SlackCommunicationError();
             }
-            messageTimestamp = responseBody.ts;
-            await fs_1.promises.writeFile(artifactLocation, messageTimestamp, 'utf-8');
-            const uploadResult = await artifactClient.uploadArtifact(ARTIFACT_KEY, [artifactLocation], tempDir);
-            (0, log_1.objectDebug)('uploadResult', uploadResult);
+            if (responseBody.ts) {
+                messageTimestamp = responseBody.ts;
+                await fs_1.promises.writeFile(artifactLocation, messageTimestamp, 'utf-8');
+                const uploadResult = await artifactClient.uploadArtifact(ARTIFACT_KEY, [artifactLocation], tempDir);
+                (0, log_1.objectDebug)('uploadResult', uploadResult);
+            }
         }
         log_1.default.info(`slacksync: finished action (${messageTimestamp})`);
     }
     catch (error) {
         console.trace(error);
-        if (error instanceof SlackCommunicationError) {
+        if (error instanceof SlackCommunicationError || error instanceof SlackOutputError) {
             log_1.default.error(`${error.code}: ${error.message}`);
+            log_1.default.info(`Retrying... (${retries} retries left)`);
+            if (retries) {
+                await run(retries - 1);
+            }
         }
         else {
             core.setFailed(error instanceof Error ? error.message : `unknown error: ${error}`);

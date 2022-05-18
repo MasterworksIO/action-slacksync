@@ -3,6 +3,11 @@
 ## Unreleased
 
 
+## 1.2.0 - 2022-05-18
+
+- Validate json payload response from Slack
+- Add optional endpoint input
+
 ## 1.1.1 - 2022-02-22
 
 - Improve handling and logging of Slack errors
