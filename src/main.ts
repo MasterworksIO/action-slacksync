@@ -1,6 +1,6 @@
-import { promises as fs } from 'fs'
-import * as os from 'os'
-import * as path from 'path'
+import { promises as fs } from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
 
 import * as artifact from '@actions/artifact'
 import * as core from '@actions/core'
@@ -8,7 +8,7 @@ import { context, getOctokit } from '@actions/github'
 import fetch from 'node-fetch'
 
 import type { Context } from '@actions/github/lib/context'
-import type { Endpoints } from '@octokit/types'
+import type { Endpoints } from '@octokit/types/dist-types/index.d.ts'
 import type { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api'
 
 import log, { objectDebug } from './log'
