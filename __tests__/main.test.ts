@@ -1,12 +1,18 @@
-import * as process from 'process'
-import * as cp from 'child_process'
-import * as path from 'path'
+import * as process from 'node:process'
+import * as cp from 'node:child_process'
+import * as path from 'node:path'
 
-const REQUIRED_VARIABLES = ['INPUT_GITHUB_TOKEN', 'SLACKSYNC_CHANNEL', 'SLACKSYNC_TOKEN']
+const REQUIRED_VARIABLES = [
+  'INPUT_GITHUB_TOKEN',
+  'SLACKSYNC_CHANNEL',
+  'SLACKSYNC_TOKEN',
+  'GITHUB_RUN_ID',
+  'GITHUB_REPOSITORY',
+]
 
 // shows how the runner will run a javascript action with env / stdout protocol
-test('test runs', () => {
-  for (let env of REQUIRED_VARIABLES) {
+test('it runs without failing', () => {
+  for (const env of REQUIRED_VARIABLES) {
     if (!process.env[env]) {
       throw new Error(`${env} has to be set in order to run tests`)
     }
@@ -17,5 +23,8 @@ test('test runs', () => {
     env: process.env,
   }
 
-  console.log(cp.execSync(`node ${ip}`, options).toString())
+  expect(() => {
+    // eslint-disable-next-line no-sync
+    console.log(cp.execSync(`node ${ip}`, options).toString())
+  }).not.toThrow()
 })

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Upgrade node version to lastest LTS and all dependencies
 
 ## 1.2.0 - 2022-05-18
 
