@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Fix .nvm version
 - Use exact version for eslint-plugin-node
 - Add SECURITY.md docs
 
