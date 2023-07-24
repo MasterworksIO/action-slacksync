@@ -4,7 +4,6 @@
   "private": true,
   "description": "Sync job status with Slack",
   "main": "dist/index.js",
-  "type": "module",
   "engines": {
     "node": "^18.12.0"
   },

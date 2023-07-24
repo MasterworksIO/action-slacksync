@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Rollback usage of modules because it breaks dynamic import at runners
 - Fix .nvm version
 - Use exact version for eslint-plugin-node
 - Add SECURITY.md docs
