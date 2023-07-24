@@ -15,4 +15,4 @@ We only support the latest major version of this software following the [Semanti
 
 If you would like to report a potential security issue in this project, please do not create a GitHub issue.
 
-Instead, send an email to [`security@masterworks.io`](mailto:security@masterworks.io) with the details. We will make sure to review and respond back in a timely manner.
+Instead, send an email to [`security@masterworks.com`](mailto:security@masterworks.com) with the details. We will make sure to review and respond back in a timely manner.
