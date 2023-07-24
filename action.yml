@@ -15,5 +15,5 @@ inputs:
     required: true
 runs:
   using: 'node16'
-  main: 'dist/index.js'
-  post: 'dist/index.js'
+  main: 'dist/main.js'
+  post: 'dist/main.js'
