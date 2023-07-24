@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+
+## 1.4.0 - 2023-07-24
+
 - Replace ncc with tsup to address issues with dynamic imports
 - Rollback usage of modules because it breaks dynamic import at runners
 - Fix .nvm version
