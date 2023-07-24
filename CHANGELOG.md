@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Use exact version for eslint-plugin-node
 - Add SECURITY.md docs
 
 ## 1.3.0 - 2023-07-23
