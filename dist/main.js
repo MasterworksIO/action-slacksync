@@ -26779,13 +26779,13 @@ var require_errors3 = __commonJS({
       }
     };
     exports.InvalidResponseError = InvalidResponseError;
-    var ArtifactNotFoundError = class extends Error {
+    var ArtifactNotFoundError2 = class extends Error {
       constructor(message = "Artifact not found") {
         super(message);
         this.name = "ArtifactNotFoundError";
       }
     };
-    exports.ArtifactNotFoundError = ArtifactNotFoundError;
+    exports.ArtifactNotFoundError = ArtifactNotFoundError2;
     var GHESNotSupportedError = class extends Error {
       constructor(message = "@actions/artifact v2.0.0+, upload-artifact@v4+ and download-artifact@v4+ are not currently supported on GHES.") {
         super(message);
@@ -103784,7 +103784,7 @@ var run = async (retries = 3) => {
       const artifactBuffer = await fs.promises.readFile(artifactLocation, { encoding: "utf-8" });
       messageTimestamp = artifactBuffer.toString();
     } catch (err) {
-      if (err instanceof Error && err.message.match(/unable to find/i)) {
+      if (err instanceof artifact.ArtifactNotFoundError) {
         log_default.info("No artifact found");
       } else {
         throw err;

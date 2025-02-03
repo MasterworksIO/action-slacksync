@@ -139,7 +139,7 @@ const run = async (retries = 3): Promise<void> => {
       // @actions/artifact just throws a generic new Error(<string>), no class instance and not even
       // an error code, thus we cannot identify it by anything other than the message.
       // if (err instanceof Error && err.message.match(/unable to find/i)) {
-      if(err instanceof artifact.ArtifactNotFoundError) {
+      if (err instanceof artifact.ArtifactNotFoundError) {
         log.info('No artifact found')
       } else {
         throw err
