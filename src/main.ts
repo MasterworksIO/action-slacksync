@@ -129,7 +129,7 @@ const run = async (retries = 3): Promise<void> => {
       const artifactResponse = await artifactClient.getArtifact(ARTIFACT_KEY)
       // get the ARTIFACT_ID used to download the artifact.
       const ARTIFACT_ID: number = artifactResponse.artifact.id
-      const downloadResult = await artifactClient.downloadArtifact(ARTIFACT_ID, {path: tempDir})
+      const downloadResult = await artifactClient.downloadArtifact(ARTIFACT_ID, { path: tempDir })
 
       objectDebug('downloadResult', downloadResult)
 
