@@ -136,9 +136,7 @@ const run = async (retries = 3): Promise<void> => {
       const artifactBuffer = await fs.readFile(artifactLocation, { encoding: 'utf-8' })
       messageTimestamp = artifactBuffer.toString()
     } catch (err: unknown) {
-      // @actions/artifact just throws a generic new Error(<string>), no class instance and not even
-      // an error code, thus we cannot identify it by anything other than the message.
-      // if (err instanceof Error && err.message.match(/unable to find/i)) {
+      // Check if Error is ArtifactNotFoundError if so log and continue.
       if (err instanceof artifact.ArtifactNotFoundError) {
         log.info('No artifact found')
       } else {
