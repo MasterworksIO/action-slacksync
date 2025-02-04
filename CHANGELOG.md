@@ -1,7 +1,7 @@
 # Changelog
 
 ## Unreleased
-
+- Update @actions/artifact to 2.2.1 to fix issue with artifact container creation
 
 ## 1.4.0 - 2023-07-24
 
