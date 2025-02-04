@@ -81,7 +81,7 @@ const defaultRenderer: IRenderer = ({ jobs }) => {
   }
 }
 
-const artifactClient = artifact.create()
+const artifactClient = new artifact.DefaultArtifactClient()
 
 const ARTIFACT_KEY = 'slacksync'
 const ARTIFACT_FILENAME = 'slacksync.txt'
@@ -125,16 +125,19 @@ const run = async (retries = 3): Promise<void> => {
     let messageTimestamp
 
     try {
-      const downloadResult = await artifactClient.downloadArtifact(ARTIFACT_KEY, tempDir)
+      // return the most recent artifact with the 'slacksync' key
+      const artifactResponse = await artifactClient.getArtifact(ARTIFACT_KEY)
+      // get the ARTIFACT_ID used to download the artifact.
+      const ARTIFACT_ID: number = artifactResponse.artifact.id
+      const downloadResult = await artifactClient.downloadArtifact(ARTIFACT_ID, { path: tempDir })
 
       objectDebug('downloadResult', downloadResult)
 
       const artifactBuffer = await fs.readFile(artifactLocation, { encoding: 'utf-8' })
       messageTimestamp = artifactBuffer.toString()
     } catch (err: unknown) {
-      // @actions/artifact just throws a generic new Error(<string>), no class instance and not even
-      // an error code, thus we cannot identify it by anything other than the message.
-      if (err instanceof Error && err.message.match(/unable to find/i)) {
+      // Check if Error is ArtifactNotFoundError if so log and continue.
+      if (err instanceof artifact.ArtifactNotFoundError) {
         log.info('No artifact found')
       } else {
         throw err
