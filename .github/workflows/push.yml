@@ -7,13 +7,13 @@ env:
 
 jobs:
   prepare:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v1
     - uses: ./
 
   tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [prepare]
     steps:
     - uses: actions/checkout@v1
@@ -22,7 +22,7 @@ jobs:
     - run: export INPUT_GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}' npm run test
 
   conclusion:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [tests]
     steps:
     - uses: actions/checkout@v1

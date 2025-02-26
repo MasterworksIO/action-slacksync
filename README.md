@@ -36,7 +36,7 @@ env:
 jobs:
   prepare:
     name: Prepare
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
       - uses: actions/checkout@v2
@@ -44,7 +44,7 @@ jobs:
 
   lint:
     name: Lint
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: prepare
 
     steps:
@@ -55,7 +55,7 @@ jobs:
 
   build:
     name: Build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: prepare
 
     steps:
@@ -65,7 +65,7 @@ jobs:
 
   deploy:
     name: Deploy
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [build, lint]
 
     steps:
@@ -77,7 +77,7 @@ jobs:
 
   conclusion:
     name: 'Conclusion'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [deploy]
     if: always()
     steps:
