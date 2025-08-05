@@ -4,6 +4,7 @@
 
 - Pin workflows to the latest Ubuntu LTS version
 - Remove package-lock.json from the repo
+- Pin workflows to the latest Ubuntu LTS version
 
 ## 1.5.0 - 20250-02-05
 

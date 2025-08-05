@@ -14,6 +14,6 @@ inputs:
     default: ${{ github.token }} # same as ${{ secrets.GITHUB_TOKEN }}
     required: true
 runs:
-  using: 'node16'
-  main: 'dist/main.js'
-  post: 'dist/main.js'
+  using: 'node20'
+  main: 'dist/main.cjs'
+  post: 'dist/main.cjs'

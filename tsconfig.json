@@ -1,16 +1,45 @@
 {
+  // Visit https://aka.ms/tsconfig to read more about this file
   "compilerOptions": {
+    // Output
     "noEmit": true,
-    "allowJs": true,
-    "lib": ["ESNext"],
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "target": "ES2020",
-    "strict": true,
-    "esModuleInterop": true,
+
+    // Module Resolution
+    "module": "nodenext",
+    "moduleDetection": "force",
+    "target": "esnext",
+
+    // Language features
+    "emitDecoratorMetadata": false,
+    "experimentalDecorators": false,
+    "jsx": "preserve",
+
+    // Compiler optimizations
+    "composite": true,
     "isolatedModules": true,
-    "skipLibCheck": true
-  },
-  "include": ["src/**/*", "__tests__/**/*", "jest.config.mjs", "tsup.config.ts"],
-  "exclude": ["node_modules"]
+    "skipLibCheck": true,
+
+    // Direct ts file imports and ESM compatibility
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "verbatimModuleSyntax": true,
+
+    // Environment
+    "types": [],
+
+    // Stricter Typechecking Options
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noUncheckedSideEffectImports": true,
+    "strict": true,
+
+    // Style Options
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+  }
 }
+

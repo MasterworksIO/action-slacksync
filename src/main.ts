@@ -5,13 +5,14 @@ import * as path from 'node:path'
 import * as artifact from '@actions/artifact'
 import * as core from '@actions/core'
 import { context, getOctokit } from '@actions/github'
-import fetch from 'node-fetch'
-
-import type { Context } from '@actions/github/lib/context'
 import type { Endpoints } from '@octokit/types/dist-types/index.d.ts'
 import type { ChatPostMessageArguments, WebAPICallResult } from '@slack/web-api'
+import fetch from 'node-fetch'
+import * as v from 'valibot'
 
-import log, { objectDebug } from './log'
+import log, { objectDebug } from './log.ts'
+
+type Context = typeof context
 
 class SlackCommunicationError extends Error {
   code = ''
@@ -41,8 +42,6 @@ export type RendererInput = {
 export type RendererOutput = Pick<
   ChatPostMessageArguments,
   | 'as_user'
-  | 'attachments'
-  | 'blocks'
   | 'icon_emoji'
   | 'icon_url'
   | 'link_names'
@@ -53,7 +52,6 @@ export type RendererOutput = Pick<
   | 'thread_ts'
   | 'unfurl_links'
   | 'unfurl_media'
-  | 'username'
 >
 
 export interface IRenderer {
@@ -89,35 +87,49 @@ const DEFAULT_ENDPOINT = 'https://slack.com/api'
 
 const CWD = process.cwd()
 
+const ConfigSchema = v.object({
+  token: v.string(),
+  channel: v.string(),
+  renderer: v.optional(v.string()),
+  endpoint: v.string(),
+  githubRunId: v.number(),
+  githubToken: v.string(),
+})
+
 const run = async (retries = 3): Promise<void> => {
   try {
-    const options = {
-      token: core.getInput('token') || process.env.SLACKSYNC_TOKEN,
-      channel: core.getInput('channel') || process.env.SLACKSYNC_CHANNEL,
-      renderer: core.getInput('renderer') || process.env.SLACKSYNC_RENDERER,
-      // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-      endpoint: core.getInput('endpoint') || process.env.SLACKSYNC_ENDPOINT || DEFAULT_ENDPOINT,
+    const parsed = v.safeParse(ConfigSchema, {
+      token: core.getInput('token') || process.env['SLACKSYNC_TOKEN'],
+      channel: core.getInput('channel') || process.env['SLACKSYNC_CHANNEL'],
+      renderer: core.getInput('renderer') || process.env['SLACKSYNC_RENDERER'],
+      endpoint: core.getInput('endpoint') || process.env['SLACKSYNC_ENDPOINT'] || DEFAULT_ENDPOINT,
+      githubRunId: Number(process.env['GITHUB_RUN_ID']),
+      githubToken: core.getInput('GITHUB_TOKEN') || process.env['GITHUB_TOKEN'],
+    })
+
+    if (parsed.issues) {
+      throw new TypeError(v.summarize(parsed.issues))
     }
 
-    objectDebug('options', options)
+    const options = parsed.output
 
-    const githubRunId = Number(process.env.GITHUB_RUN_ID)
+    objectDebug('options', options)
 
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'slacksync'))
     const artifactLocation = path.resolve(tempDir, ARTIFACT_FILENAME)
 
-    log.info(`slacksync: GITHUB_RUN_ID=${process.env.GITHUB_RUN_ID}`)
-    log.info(`slacksync: GITHUB_TOKEN=${core.getInput('GITHUB_TOKEN')}`)
+    log.info(`slacksync: GITHUB_RUN_ID=${options.githubRunId}`)
+    log.info(`slacksync: GITHUB_TOKEN=${options.githubToken}`)
 
     objectDebug('context', context)
 
-    const github = getOctokit(core.getInput('GITHUB_TOKEN'))
+    const github = getOctokit(options.githubToken)
 
     const jobs: ActionsListJobsForWorkflowRunJobs = await github.paginate(
       github.rest.actions.listJobsForWorkflowRun.endpoint.merge({
         ...context.repo,
-        run_id: githubRunId,
-      })
+        run_id: options.githubRunId,
+      }),
     )
 
     objectDebug('jobs', jobs)
@@ -125,16 +137,16 @@ const run = async (retries = 3): Promise<void> => {
     let messageTimestamp
 
     try {
-      // return the most recent artifact with the 'slacksync' key
+      // Return the most recent artifact with the 'slacksync' key
       const artifactResponse = await artifactClient.getArtifact(ARTIFACT_KEY)
-      // get the ARTIFACT_ID used to download the artifact.
+      // Get the ARTIFACT_ID used to download the artifact.
       const ARTIFACT_ID: number = artifactResponse.artifact.id
       const downloadResult = await artifactClient.downloadArtifact(ARTIFACT_ID, { path: tempDir })
 
       objectDebug('downloadResult', downloadResult)
 
       const artifactBuffer = await fs.readFile(artifactLocation, { encoding: 'utf-8' })
-      messageTimestamp = artifactBuffer.toString()
+      messageTimestamp = artifactBuffer
     } catch (err: unknown) {
       // Check if Error is ArtifactNotFoundError if so log and continue.
       if (err instanceof artifact.ArtifactNotFoundError) {
@@ -153,13 +165,13 @@ const run = async (retries = 3): Promise<void> => {
 
       log.debug(`slacksync: rendererLocation=${rendererLocation}`)
 
-      renderer = (await import(rendererLocation)).default as IRenderer
+      renderer = ((await import(rendererLocation)) as { default: IRenderer }).default
     }
 
     const renderResult = renderer({
       channel: options.channel,
       context,
-      githubRunId,
+      githubRunId: options.githubRunId,
       isUpdating: Boolean(messageTimestamp),
       jobs,
     })
@@ -202,7 +214,7 @@ const run = async (retries = 3): Promise<void> => {
 
       try {
         responseBody = (await response.json()) as SlackMessageResult
-      } catch (error: unknown) {
+      } catch {
         throw new SlackOutputError()
       }
       objectDebug('responseBody', responseBody)
@@ -242,7 +254,7 @@ const run = async (retries = 3): Promise<void> => {
 
       try {
         responseBody = (await response.json()) as SlackMessageResult
-      } catch (error: unknown) {
+      } catch {
         throw new SlackOutputError()
       }
 
@@ -259,7 +271,7 @@ const run = async (retries = 3): Promise<void> => {
         const uploadResult = await artifactClient.uploadArtifact(
           ARTIFACT_KEY,
           [artifactLocation],
-          tempDir
+          tempDir,
         )
 
         objectDebug('uploadResult', uploadResult)
@@ -277,7 +289,7 @@ const run = async (retries = 3): Promise<void> => {
         await run(retries - 1)
       }
     } else {
-      core.setFailed(error instanceof Error ? error.message : `unknown error: ${error}`)
+      core.setFailed(error instanceof Error ? error.message : `unknown error: ${String(error)}`)
     }
   }
 }
