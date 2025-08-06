@@ -2,6 +2,8 @@ import * as process from 'node:process'
 import * as cp from 'node:child_process'
 import * as path from 'node:path'
 
+import { test, expect } from 'vitest'
+
 const REQUIRED_VARIABLES = [
   'INPUT_GITHUB_TOKEN',
   'SLACKSYNC_CHANNEL',
